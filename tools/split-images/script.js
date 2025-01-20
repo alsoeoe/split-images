@@ -89,6 +89,16 @@ class ImageSplitter {
                 container.classList.remove('dragging');
             }
         });
+
+        // 下载全部按钮点击事件
+        document.getElementById('downloadAllBtn').addEventListener('click', () => {
+            this.downloadAllImages();
+        });
+
+        // 发送压缩按钮点击事件
+        document.getElementById('sendToCompressBtn').addEventListener('click', () => {
+            this.sendToCompress();
+        });
     }
 
     handleKeyDown(e) {
@@ -634,6 +644,90 @@ class ImageSplitter {
             link.download = 'all_sections.zip';
             link.click();
         });
+    }
+
+    // 发送图片到压缩工具
+    async sendToCompress() {
+        if (!this.image) {
+            alert('请先添加图片');
+            return;
+        }
+
+        const positions = [...this.lines.map(line => line.y)].sort((a, b) => a - b);
+        positions.unshift(0);
+        positions.push(this.image.height);
+
+        const files = [];
+        
+        // 为每个分割区域创建图片文件
+        for (let i = 0; i < positions.length - 1; i++) {
+            const startY = positions[i];
+            const endY = positions[i + 1];
+            const height = endY - startY;
+            const sectionInfo = this.verticalSections.get(i) || { splits: 1 };
+            const splits = sectionInfo.splits;
+
+            // 为每个垂直分割创建图片
+            for (let j = 0; j < splits; j++) {
+                const canvas = document.createElement('canvas');
+                const partWidth = this.image.width / splits;
+                
+                canvas.width = partWidth;
+                canvas.height = height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                
+                ctx.drawImage(
+                    this.image,
+                    j * partWidth, startY,
+                    partWidth, height,
+                    0, 0,
+                    partWidth, height
+                );
+
+                // 将 canvas 转换为文件
+                await new Promise(resolve => {
+                    canvas.toBlob(blob => {
+                        const fileName = splits > 1 ? 
+                            `section_${i + 1}_part_${j + 1}.png` : 
+                            `section_${i + 1}.png`;
+                        files.push(new File([blob], fileName, { type: 'image/png' }));
+                        resolve();
+                    }, 'image/png');
+                });
+            }
+        }
+
+        if (files.length === 0) {
+            alert('没有可发送的图片');
+            return;
+        }
+
+        // 将文件数据转换为 base64
+        const filesData = await Promise.all(files.map(async file => {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve({
+                    name: file.name,
+                    type: file.type,
+                    data: reader.result
+                });
+                reader.readAsDataURL(file);
+            });
+        }));
+
+        // 存储文件数据
+        localStorage.setItem('pendingCompressImages', JSON.stringify(filesData));
+
+        // 跳转到压缩工具页面
+        window.location.href = '../compress-images/index.html';
+    }
+
+    // 下载所有图片
+    downloadAllImages() {
+        // ... existing code ...
     }
 }
 

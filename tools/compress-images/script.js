@@ -24,10 +24,12 @@ class ImageCompressorApp {
         this.currentQuality = 0.8;
         this.currentFormat = 'original'; // 默认使用原格式
         
-        // 存储原始文件
+        // 存储原始文件和压缩后的文件
         this.imageFiles = new WeakMap();
+        this.compressedFiles = new WeakMap();
         
         this.initEventListeners();
+        this.checkPendingImages();
     }
     
     initEventListeners() {
@@ -104,7 +106,7 @@ class ImageCompressorApp {
             });
         });
 
-        // 格式选择按钮点击事件
+        // 格式按钮点击事件
         this.formatButtons.forEach(button => {
             button.addEventListener('click', () => {
                 // 移除其他按钮的激活状态
@@ -118,58 +120,15 @@ class ImageCompressorApp {
             });
         });
 
-        // 压缩全部按钮点击事件
+        // 重新压缩按钮点击事件
         document.getElementById('compressAllBtn').addEventListener('click', () => {
-            const allItems = Array.from(document.querySelectorAll('#imageListBody tr'));
-            
-            allItems.forEach(row => {
-                const recompressBtn = row.querySelector('.recompress-btn');
-                if (recompressBtn) {
-                    recompressBtn.click();
+            const items = this.imageList.querySelectorAll('tr');
+            items.forEach(item => {
+                const file = this.imageFiles.get(item);
+                if (file) {
+                    this.compressImage(file, item);
                 }
             });
-        });
-
-        // 下载全部按钮点击事件
-        document.getElementById('downloadAllBtn').addEventListener('click', async () => {
-            const compressedItems = Array.from(document.querySelectorAll('#imageListBody tr')).filter(row => {
-                const downloadBtn = row.querySelector('.download-btn');
-                return !downloadBtn.classList.contains('hidden');
-            });
-
-            if (compressedItems.length === 0) {
-                alert('没有可下载的压缩图片');
-                return;
-            }
-
-            // 如果只有一个文件，直接下载
-            if (compressedItems.length === 1) {
-                compressedItems[0].querySelector('.download-btn').click();
-                return;
-            }
-
-            // 如果有多个文件，使用 JSZip 打包下载
-            const zip = new JSZip();
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
-            for (const item of compressedItems) {
-                const filename = item.querySelector('.filename').textContent;
-                const downloadUrl = item.querySelector('.download-btn').dataset.downloadUrl;
-                const response = await fetch(downloadUrl);
-                const blob = await response.blob();
-                zip.file(filename, blob);
-            }
-
-            // 生成并下载 zip 文件
-            const zipBlob = await zip.generateAsync({ type: 'blob' });
-            const zipUrl = URL.createObjectURL(zipBlob);
-            const link = document.createElement('a');
-            link.href = zipUrl;
-            link.download = `compressed-images-${timestamp}.zip`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(zipUrl);
         });
 
         // 清空列表按钮点击事件
@@ -182,6 +141,11 @@ class ImageCompressorApp {
                 // 清理内存中的图片文件引用
                 this.imageFiles = new WeakMap();
             }
+        });
+
+        // 下载全部按钮点击事件
+        document.getElementById('downloadAllBtn').addEventListener('click', () => {
+            this.downloadAllFiles();
         });
     }
     
@@ -297,31 +261,29 @@ class ImageCompressorApp {
         try {
             const outputFormat = this.getOutputFormat(file);
             const options = {
-                maxSizeMB: 10, // 最大文件大小
-                useWebWorker: true, // 使用 Web Worker
-                initialQuality: this.currentQuality, // 初始压缩质量
-                fileType: `image/${outputFormat}`, // 输出格式
+                maxSizeMB: 10,
+                useWebWorker: true,
+                initialQuality: this.currentQuality,
+                fileType: `image/${outputFormat}`,
                 onProgress: (progress) => {
-                    // 更新进度条
                     progressBar.style.width = `${progress * 100}%`;
                 }
             };
 
             // PNG 格式的特殊处理
             if (outputFormat === 'png') {
-                // 根据质量设置颜色数量和抖色系数
                 const qualitySettings = {
-                    0.8: { colors: 256, dithering: 0 },    // 无损
-                    0.6: { colors: 256, dithering: 0.5 },  // 最高画质
-                    0.4: { colors: 128, dithering: 0.8 },  // 高画质
-                    0.2: { colors: 64, dithering: 1 },     // 中画质
-                    0.1: { colors: 32, dithering: 1 },     // 低画质
-                    0.05: { colors: 16, dithering: 1 }     // 极低画质
+                    0.8: { colors: 256, dithering: 0 },
+                    0.6: { colors: 256, dithering: 0.5 },
+                    0.4: { colors: 128, dithering: 0.8 },
+                    0.2: { colors: 64, dithering: 1 },
+                    0.1: { colors: 32, dithering: 1 },
+                    0.05: { colors: 16, dithering: 1 }
                 };
 
                 const settings = qualitySettings[this.currentQuality] || { colors: 256, dithering: 0 };
-                options.numColors = settings.colors;         // 颜色数量
-                options.dithering = settings.dithering;     // 抖色系数
+                options.numColors = settings.colors;
+                options.dithering = settings.dithering;
             }
 
             // 压缩图片
@@ -336,15 +298,26 @@ class ImageCompressorApp {
             // 显示下载按钮
             downloadBtn.classList.remove('hidden');
             
+            // 保存压缩后的文件
+            this.compressedFiles.set(item, compressedFile);
+            
             // 设置下载事件
-            downloadBtn.onclick = () => {
-                const downloadUrl = URL.createObjectURL(compressedFile);
-                const link = document.createElement('a');
-                link.href = downloadUrl;
+            downloadBtn.onclick = (e) => {
                 const ext = this.getOutputExtension(outputFormat);
-                link.download = `compressed_${file.name.replace(/\.[^/.]+$/, '')}.${ext}`;
-                link.click();
-                URL.revokeObjectURL(downloadUrl);
+                const fileName = `compressed_${file.name.replace(/\.[^/.]+$/, '')}.${ext}`;
+                
+                if (e.isTrusted) {
+                    // 用户实际点击，执行下载
+                    const downloadUrl = URL.createObjectURL(compressedFile);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = fileName;
+                    link.click();
+                    URL.revokeObjectURL(downloadUrl);
+                } else {
+                    // 程序触发的点击，返回文件对象
+                    return compressedFile;
+                }
             };
 
         } catch (error) {
@@ -352,6 +325,82 @@ class ImageCompressorApp {
             compressedSize.textContent = '压缩失败';
             compressionRatio.textContent = '';
             progressBar.style.width = '0%';
+        }
+    }
+
+    // 下载单个文件
+    downloadFile(file, fileName) {
+        const downloadUrl = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(downloadUrl);
+    }
+
+    // 下载全部文件
+    async downloadAllFiles() {
+        const compressedItems = Array.from(document.querySelectorAll('#imageListBody tr')).filter(row => {
+            return !row.querySelector('.download-btn').classList.contains('hidden');
+        });
+
+        if (compressedItems.length === 0) {
+            alert('没有可下载的压缩图片');
+            return;
+        }
+
+        // 如果只有一个文件，直接下载
+        if (compressedItems.length === 1) {
+            const item = compressedItems[0];
+            const compressedFile = this.compressedFiles.get(item);
+            const originalFile = this.imageFiles.get(item);
+            const outputFormat = this.getOutputFormat(originalFile);
+            const ext = this.getOutputExtension(outputFormat);
+            const fileName = `compressed_${originalFile.name.replace(/\.[^/.]+$/, '')}.${ext}`;
+            this.downloadFile(compressedFile, fileName);
+            return;
+        }
+
+        // 如果有多个文件，使用 JSZip 打包下载
+        const zip = new JSZip();
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+        for (const item of compressedItems) {
+            const compressedFile = this.compressedFiles.get(item);
+            const originalFile = this.imageFiles.get(item);
+            const outputFormat = this.getOutputFormat(originalFile);
+            const ext = this.getOutputExtension(outputFormat);
+            const fileName = `compressed_${originalFile.name.replace(/\.[^/.]+$/, '')}.${ext}`;
+            zip.file(fileName, compressedFile);
+        }
+
+        // 生成并下载 zip 文件
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        this.downloadFile(zipBlob, `compressed-images-${timestamp}.zip`);
+    }
+
+    // 检查是否有待处理的图片
+    async checkPendingImages() {
+        const pendingImages = localStorage.getItem('pendingCompressImages');
+        if (pendingImages) {
+            try {
+                const filesData = JSON.parse(pendingImages);
+                const files = await Promise.all(filesData.map(async fileData => {
+                    // 将 base64 转换回 File 对象
+                    const response = await fetch(fileData.data);
+                    const blob = await response.blob();
+                    return new File([blob], fileData.name, { type: fileData.type });
+                }));
+
+                // 处理图片
+                this.handleFiles(files);
+
+                // 清除临时数据
+                localStorage.removeItem('pendingCompressImages');
+            } catch (error) {
+                console.error('处理待压缩图片时出错:', error);
+                localStorage.removeItem('pendingCompressImages');
+            }
         }
     }
 }
