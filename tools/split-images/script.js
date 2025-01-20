@@ -57,7 +57,12 @@ class ImageSplitter {
     }
 
     initEventListeners() {
-        this.uploadBtn.addEventListener('click', () => this.imageInput.click());
+        // 移除原有的上传按钮点击事件，因为现在在提示区域中有新的上传按钮
+        this.uploadBtn.addEventListener('click', () => {
+            if (this.image) {
+                this.imageInput.click();
+            }
+        });
         this.imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
         this.downloadAllBtn.addEventListener('click', () => this.downloadAllSections());
         
@@ -79,6 +84,11 @@ class ImageSplitter {
         const container = this.canvas.parentElement;
         container.addEventListener('dragover', this.handleDragOver.bind(this));
         container.addEventListener('drop', this.handleDrop.bind(this));
+        container.addEventListener('dragleave', (e) => {
+            if (e.target === container) {
+                container.classList.remove('dragging');
+            }
+        });
     }
 
     handleKeyDown(e) {
@@ -113,6 +123,7 @@ class ImageSplitter {
         if (this.image) return; // 如果已有图片，不处理拖拽事件
         e.preventDefault();
         e.stopPropagation();
+        this.canvas.parentElement.classList.add('dragging');
     }
 
     handleDrop(e) {
@@ -120,6 +131,7 @@ class ImageSplitter {
         
         e.preventDefault();
         e.stopPropagation();
+        this.canvas.parentElement.classList.remove('dragging');
 
         const files = e.dataTransfer.files;
         if (files.length > 0) {
@@ -136,6 +148,12 @@ class ImageSplitter {
         if (dropZone) {
             dropZone.style.display = this.image ? 'none' : 'flex';
         }
+        // 更新重新上传按钮的状态
+        if (this.uploadBtn) {
+            this.uploadBtn.classList.toggle('opacity-50', !this.image);
+            this.uploadBtn.classList.toggle('cursor-not-allowed', !this.image);
+            this.uploadBtn.disabled = !this.image;
+        }
     }
 
     loadImage(file) {
@@ -144,6 +162,7 @@ class ImageSplitter {
             const img = new Image();
             img.onload = () => {
                 this.image = img;
+                this.canvas.classList.remove('hidden');
                 this.setupCanvas();
                 this.resetView();
                 this.draw();
@@ -459,26 +478,26 @@ class ImageSplitter {
             const actions = document.createElement('div');
             actions.className = 'actions';
             actions.innerHTML = `
-                <button class="merge-btn ${splits > 1 ? '' : 'opacity-50 cursor-not-allowed'}" ${splits > 1 ? '' : 'disabled'}>
-                    <svg class="-ml-0.5 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <button class="${splits > 1 ? '' : 'opacity-50 cursor-not-allowed'}" ${splits > 1 ? '' : 'disabled'}>
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M4 7h16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                     合并
                 </button>
-                <button class="split-btn">
-                    <svg class="-ml-0.5 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <button>
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M4 7h6M14 7h6M4 12h6M14 12h6" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                     2等分
                 </button>
-                <button class="split-btn">
-                    <svg class="-ml-0.5 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <button>
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M4 7h4M10 7h4M16 7h4M4 12h4M10 12h4M16 12h4" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                     3等分
                 </button>
                 <button class="download-btn">
-                    <svg class="-ml-0.5 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M12 4v13m0 0l-4-4m4 4l4-4m-10 6v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     下载
@@ -486,10 +505,15 @@ class ImageSplitter {
             `;
 
             // 添加按钮事件监听
-            const mergeBtn = actions.querySelector('.merge-btn');
-            const split2Btn = actions.querySelector('.split-btn:nth-child(2)');
-            const split3Btn = actions.querySelector('.split-btn:nth-child(3)');
+            const mergeBtn = actions.querySelector('button:nth-child(1)');
+            const split2Btn = actions.querySelector('button:nth-child(2)');
+            const split3Btn = actions.querySelector('button:nth-child(3)');
             const downloadBtn = actions.querySelector('.download-btn');
+
+            // 设置当前选中状态
+            if (splits === 1) mergeBtn.classList.add('active');
+            if (splits === 2) split2Btn.classList.add('active');
+            if (splits === 3) split3Btn.classList.add('active');
 
             // 合并功能
             if (splits > 1) {

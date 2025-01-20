@@ -215,16 +215,22 @@
                             <div class="text-center">
                                 <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
                                 <div class="text-center">
-                                    <svg class="upload-icon mx-auto h-12 w-12 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    <div class="mt-4">
-                                        <label for="fileInput" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
-                                            选择图片
-                                        </label>
-                                        <p class="mt-2 text-sm text-gray-600">或将图片拖放到此区域的任意位置</p>
+                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+                                        <svg class="h-6 w-6 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                        </svg>
                                     </div>
-                                    <p class="mt-1 text-xs text-gray-500">支持 PNG、JPG、JPEG、WebP 格式</p>
+                                    <div class="mt-4">
+                                        <div class="text-sm font-semibold text-gray-900">添加图片</div>
+                                        <p class="mt-1 text-sm text-gray-500">拖拽图片到此处，或按 Ctrl+V 粘贴</p>
+                                        <button class="mt-4 inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="document.getElementById('fileInput').click()">
+                                            <svg class="-ml-0.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M9.25 13.25a.75.75 0 001.5 0V4.636l2.955 3.129a.75.75 0 001.09-1.03l-4.25-4.5a.75.75 0 00-1.09 0l-4.25 4.5a.75.75 0 101.09 1.03L9.25 4.636v8.614z" />
+                                                <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+                                            </svg>
+                                            选择图片
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -286,5 +292,4 @@
 
     <script src="script.js"></script>
 </body>
-</html> 
 </html> 

@@ -38,6 +38,23 @@ class ImageCompressorApp {
             }
         });
         
+        // 添加粘贴事件
+        document.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            const imageFiles = [];
+            
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const file = item.getAsFile();
+                    imageFiles.push(file);
+                }
+            }
+            
+            if (imageFiles.length > 0) {
+                this.handleFiles(imageFiles);
+            }
+        });
+        
         // 拖放处理
         this.dropZone.addEventListener('dragenter', (e) => {
             e.preventDefault();
