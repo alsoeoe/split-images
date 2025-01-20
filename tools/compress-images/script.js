@@ -1,3 +1,63 @@
+// IndexedDB 工具类
+class ImageDB {
+    constructor() {
+        this.dbName = 'ImageTransferDB';
+        this.storeName = 'pendingImages';
+        this.version = 1;
+    }
+
+    // 打开数据库
+    async open() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.dbName, this.version);
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                    db.createObjectStore(this.storeName, { keyPath: 'id', autoIncrement: true });
+                }
+            };
+        });
+    }
+
+    // 清空存储
+    async clearStore() {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([this.storeName], 'readwrite');
+            const store = transaction.objectStore(this.storeName);
+            const request = store.clear();
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+            
+            transaction.oncomplete = () => db.close();
+        });
+    }
+
+    // 获取所有图片
+    async getAllImages() {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([this.storeName], 'readonly');
+            const store = transaction.objectStore(this.storeName);
+            const request = store.getAll();
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                // 按索引排序
+                const sortedImages = request.result.sort((a, b) => a.index - b.index);
+                resolve(sortedImages);
+            };
+            
+            transaction.oncomplete = () => db.close();
+        });
+    }
+}
+
 // 工具函数：格式化文件大小
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 B';
@@ -381,25 +441,45 @@ class ImageCompressorApp {
 
     // 检查是否有待处理的图片
     async checkPendingImages() {
-        const pendingImages = localStorage.getItem('pendingCompressImages');
-        if (pendingImages) {
-            try {
-                const filesData = JSON.parse(pendingImages);
-                const files = await Promise.all(filesData.map(async fileData => {
-                    // 将 base64 转换回 File 对象
+        const hasPendingImages = localStorage.getItem('hasPendingImages');
+        if (!hasPendingImages) return;
+
+        try {
+            // 创建 IndexedDB 实例
+            const imageDB = new ImageDB();
+            
+            // 获取所有待处理的图片
+            const imagesData = await imageDB.getAllImages();
+            
+            if (imagesData && imagesData.length > 0) {
+                // 转换为 File 对象
+                const files = await Promise.all(imagesData.map(async fileData => {
                     const response = await fetch(fileData.data);
                     const blob = await response.blob();
-                    return new File([blob], fileData.name, { type: fileData.type });
+                    return new File([blob], fileData.name, { 
+                        type: fileData.type,
+                        lastModified: new Date().getTime()
+                    });
                 }));
 
                 // 处理图片
                 this.handleFiles(files);
+            }
 
-                // 清除临时数据
-                localStorage.removeItem('pendingCompressImages');
-            } catch (error) {
-                console.error('处理待压缩图片时出错:', error);
-                localStorage.removeItem('pendingCompressImages');
+            // 清理数据
+            await imageDB.clearStore();
+            localStorage.removeItem('hasPendingImages');
+            
+        } catch (error) {
+            console.error('处理待压缩图片时出错:', error);
+            localStorage.removeItem('hasPendingImages');
+            
+            // 尝试清理 IndexedDB
+            try {
+                const imageDB = new ImageDB();
+                await imageDB.clearStore();
+            } catch (e) {
+                console.error('清理 IndexedDB 时出错:', e);
             }
         }
     }

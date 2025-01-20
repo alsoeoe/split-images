@@ -1,3 +1,96 @@
+// IndexedDB 工具类
+class ImageDB {
+    constructor() {
+        this.dbName = 'ImageTransferDB';
+        this.storeName = 'pendingImages';
+        this.version = 1;
+    }
+
+    // 打开数据库
+    async open() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.dbName, this.version);
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                    db.createObjectStore(this.storeName, { keyPath: 'id', autoIncrement: true });
+                }
+            };
+        });
+    }
+
+    // 清空存储
+    async clearStore() {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([this.storeName], 'readwrite');
+            const store = transaction.objectStore(this.storeName);
+            const request = store.clear();
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+            
+            transaction.oncomplete = () => db.close();
+        });
+    }
+
+    // 存储图片数据
+    async storeImages(images) {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([this.storeName], 'readwrite');
+            const store = transaction.objectStore(this.storeName);
+            
+            let completed = 0;
+            let failed = false;
+
+            images.forEach((image, index) => {
+                const request = store.add({
+                    ...image,
+                    index: index // 保持顺序
+                });
+                
+                request.onerror = () => {
+                    failed = true;
+                    reject(request.error);
+                };
+                
+                request.onsuccess = () => {
+                    completed++;
+                    if (completed === images.length && !failed) {
+                        resolve();
+                    }
+                };
+            });
+            
+            transaction.oncomplete = () => db.close();
+        });
+    }
+
+    // 获取所有图片
+    async getAllImages() {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([this.storeName], 'readonly');
+            const store = transaction.objectStore(this.storeName);
+            const request = store.getAll();
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                // 按索引排序
+                const sortedImages = request.result.sort((a, b) => a.index - b.index);
+                resolve(sortedImages);
+            };
+            
+            transaction.oncomplete = () => db.close();
+        });
+    }
+}
+
 class ImageSplitter {
     constructor() {
         this.canvas = document.getElementById('mainCanvas');
@@ -705,24 +798,39 @@ class ImageSplitter {
             return;
         }
 
-        // 将文件数据转换为 base64
-        const filesData = await Promise.all(files.map(async file => {
-            return new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve({
-                    name: file.name,
-                    type: file.type,
-                    data: reader.result
+        try {
+            // 创建 IndexedDB 实例
+            const imageDB = new ImageDB();
+            
+            // 清空之前的数据
+            await imageDB.clearStore();
+
+            // 转换文件数据
+            const filesData = await Promise.all(files.map(async file => {
+                return new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve({
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        data: reader.result
+                    });
+                    reader.readAsDataURL(file);
                 });
-                reader.readAsDataURL(file);
-            });
-        }));
+            }));
 
-        // 存储文件数据
-        localStorage.setItem('pendingCompressImages', JSON.stringify(filesData));
+            // 存储所有图片数据
+            await imageDB.storeImages(filesData);
 
-        // 跳转到压缩工具页面
-        window.location.href = '../compress-images/index.html';
+            // 设置标记，表示有待处理的图片
+            localStorage.setItem('hasPendingImages', 'true');
+
+            // 跳转到压缩工具页面
+            window.location.href = '../compress-images/index.html';
+        } catch (error) {
+            console.error('存储图片数据时出错:', error);
+            alert('存储图片数据时出错，请重试');
+        }
     }
 
     // 下载所有图片
