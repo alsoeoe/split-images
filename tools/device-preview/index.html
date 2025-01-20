@@ -5,7 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>设备预览 - 火把工具箱</title>
     <script src="../../lib/tailwind.min.js"></script>
+    <!-- 添加 Swiper 的 CSS 和 JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
     <style>
+        :root {
+            --main-color: #4338CA;
+            --bg-color: #f7f8fa;
+        }
+
         /* 隐藏滚动条但保持可滚动 */
         .hide-scrollbar {
             -ms-overflow-style: none;  /* IE and Edge */
@@ -15,36 +23,195 @@
             display: none;             /* Chrome, Safari and Opera */
         }
 
-        /* 设备屏幕圆角 */
+        /* 设备屏幕 */
         .device-screen {
-            border-radius: 35px;
+            border-radius: 34px;  /* 设置圆角稍微小于外壳的圆角 */
             overflow: hidden;
         }
 
-        /* iframe 圆角 */
+        /* 预览内容 */
         .preview-content {
-            border-radius: 35px;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* 顶部区域（包含状态栏、搜索、标签） */
+        .top-section {
+            background-color: var(--main-color);
+            padding-top: 44px;
+            
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 状态栏样式 */
+        .status-bar {
+            height: 44px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background-color: var(--main-color);
+        }
+
+        /* 搜索栏 */
+        .search-bar {
+            height: 48px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+            height: 32px;
+        }
+
+        .search-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            height: 32px;
+            width: 100%;
+            padding: 0 16px 0 40px;
+            outline: none;
+            font-size: 13px;
+            color: inherit;
+        }
+
+        .search-input::placeholder {
+            color: inherit;
+            opacity: 0.6;
+        }
+
+        .punch-button {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* 标签栏 */
+        .tags-bar {
+            height: 40px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        .tags-list {
+            display: flex;
+            gap: 16px;
+            white-space: nowrap;
+            height: 24px;
+            align-items: center;
+        }
+
+        .tag {
+            height: 24px;
+            display: flex;
+            align-items: center;
+            line-height: 24px;
+        }
+
+        .tag.active {
+            font-size: 18px;
+        }
+
+        .tag:not(.active) {
+            font-size: 16px;
+            opacity: 0.6;
+        }
+
+        /* 轮播区域 */
+        .swiper-section {
+            background: linear-gradient(180deg, var(--main-color) 0%, var(--bg-color) 100%);
+            padding: 16px 0 20px;
+            
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background-color: var(--bg-color);
+            min-height: 400px;
+            flex: 1;
+        }
+
+        /* Swiper 样式 */
+        .swiper {
+            width: 375px;
+            height: 146px;
+        }
+
+        .swiper-slide {
+            width: 343px !important;
+            height: 146px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 分页器样式 */
+        .swiper-pagination {
+            bottom: 8px !important;
+        }
+
+        .swiper-pagination-bullet {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.6);
+            opacity: 1;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: #fff;
+        }
+
+        /* 渐变背景 */
+        .gradient-bg {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 100px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+            pointer-events: none;
+            z-index: 1;
         }
     </style>
 </head>
-<body class="h-full bg-gray-100 dark:bg-gray-900">
+<body class="h-full bg-[#f7f8fa]">
     <div class="min-h-full">
         <!-- 导航栏 -->
-        <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <nav class="border-b border-gray-200 bg-white">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 justify-between">
                     <div class="flex">
                         <div class="flex shrink-0 items-center">
                             <a href="../../index.html" class="flex items-center gap-x-2">
-                                <svg class="h-8 w-8 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
                                 </svg>
-                                <span class="text-xl font-bold text-indigo-600 dark:text-indigo-400">工具箱</span>
+                                <span class="text-xl font-bold text-indigo-600">工具箱</span>
                             </a>
                         </div>
                         <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-                            <span class="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900 dark:text-gray-100">设备预览</span>
+                            <span class="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900">设备预览</span>
                         </div>
                     </div>
                 </div>
@@ -57,29 +224,16 @@
                 <div class="flex gap-8">
                     <!-- 左侧控制面板 -->
                     <div class="w-80 flex-shrink-0">
-                        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                        <div class="bg-white shadow-sm rounded-lg p-6">
                             <div class="space-y-6">
-                                <!-- 设备选择 -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">设备类型</label>
-                                    <div class="mt-2 flex gap-2">
-                                        <button class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            iOS
-                                        </button>
-                                        <button class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            Android
-                                        </button>
-                                    </div>
-                                </div>
-
                                 <!-- 内容输入 -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">预览内容</label>
+                                    <label class="block text-sm font-medium text-gray-700">预览内容</label>
                                     <div class="mt-2 space-y-4">
                                         <!-- 图片上传 -->
-                                        <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors">
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-indigo-500 transition-colors">
                                             <input type="file" id="imageInput" class="hidden" accept="image/*">
-                                            <button onclick="document.getElementById('imageInput').click()" class="inline-flex items-center text-sm text-gray-600 dark:text-gray-300">
+                                            <button onclick="document.getElementById('imageInput').click()" class="inline-flex items-center text-sm text-gray-600">
                                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
@@ -88,13 +242,13 @@
                                         </div>
                                         <!-- URL 输入 -->
                                         <div>
-                                            <input type="url" placeholder="输入网址" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100 sm:text-sm">
+                                            <input type="url" placeholder="输入网址" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- 尺寸信息 -->
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                <div class="text-sm text-gray-500">
                                     <p>设备尺寸: 375 x 812</p>
                                     <p>缩放比例: 100%</p>
                                 </div>
@@ -103,19 +257,75 @@
                     </div>
 
                     <!-- 右侧预览区域 -->
-                    <div class="flex-1 flex items-center justify-center bg-white dark:bg-gray-800 shadow-sm rounded-lg p-8">
+                    <div class="flex-1 flex items-center justify-center bg-white shadow-sm rounded-lg p-8">
                         <!-- iOS 设备模拟器 -->
-                        <div class="ios-device relative" style="width: 375px; height: 812px;">
+                        <div class="ios-device relative" style="width: 403px; height: 840px;">
                             <!-- 设备外壳 -->
-                            <div class="absolute inset-0 border-[14px] border-black rounded-[48px] bg-white dark:bg-gray-900">
+                            <div class="absolute inset-0 border-[14px] border-black rounded-[48px] bg-white">
                                 <!-- 刘海 -->
-                                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[24px] bg-black rounded-b-[16px]"></div>
+                                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[24px] bg-black rounded-b-[16px] z-20"></div>
                                 <!-- 屏幕内容 -->
                                 <div class="device-screen w-full h-full">
-                                    <div id="previewContent" class="preview-content w-full h-full bg-white hide-scrollbar overflow-auto">
-                                        <!-- 预览内容将在这里显示 -->
-                                        <div class="flex items-center justify-center h-full text-gray-400 rounded-[35px]">
-                                            请选择图片或输入网址
+                                    <div id="previewContent" class="preview-content w-full h-[768px] hide-scrollbar overflow-auto">
+                                        <!-- 顶部区域 -->
+                                        <div class="top-section">
+                                            <!-- 状态栏 -->
+                                            <div class="status-bar">
+                                                <div class="flex justify-between items-center w-full">
+                                                    <div class="flex items-center gap-2">
+                                                        <span id="time">9:41</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-2">
+                                                        <span>100%</span>
+                                                        <div class="battery-icon">
+                                                            <div class="battery-level"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 搜索栏 -->
+                                            <div class="search-bar">
+                                                <div class="search-input-wrapper">
+                                                    <input type="search" class="search-input" placeholder="搜索">
+                                                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    </svg>
+                                                </div>
+                                                <button class="punch-button">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+
+                                            <!-- 标签栏 -->
+                                            <div class="tags-bar">
+                                                <div class="tags-list">
+                                                    <span class="tag active">精选</span>
+                                                    <span class="tag">文学</span>
+                                                    <span class="tag">社科</span>
+                                                    <span class="tag">少儿</span>
+                                                    <span class="tag">艺术</span>
+                                                    <span class="tag">生活</span>
+                                                    <span class="tag">文教</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 轮播区域 -->
+                                        <div class="swiper-section">
+                                            <div class="swiper-container">
+                                                <div class="swiper-wrapper">
+                                                    <!-- 轮播图内容将动态添加 -->
+                                                </div>
+                                                <div class="swiper-pagination"></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 内容区域 -->
+                                        <div class="content-section">
+                                            <!-- 内容将在这里显示 -->
                                         </div>
                                     </div>
                                 </div>
@@ -132,16 +342,120 @@
             const imageInput = document.getElementById('imageInput');
             const previewContent = document.getElementById('previewContent');
             const urlInput = document.querySelector('input[type="url"]');
+            const timeElement = document.getElementById('time');
+            const statusBar = document.querySelector('.status-bar');
+            let swiper = null;
+
+            // 计算背景色应该使用的文字颜色
+            function resBgColor(rgbArr) {
+                var color = 0.213 * rgbArr[0] + 0.715 * rgbArr[1] + 0.072 * rgbArr[2] > 255 / 2;
+                return color ? '#000000' : '#ffffff';
+            }
+
+            // 更新主题颜色
+            function updateThemeColor(color = '#4338CA') {
+                document.documentElement.style.setProperty('--main-color', color);
+                
+                // 将十六进制颜色转换为RGB数组
+                const hex = color.replace('#', '');
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                
+                const textColor = resBgColor([r, g, b]);
+                
+                // 更新所有需要使用文字颜色的元素
+                const topSection = document.querySelector('.top-section');
+                if (topSection) {
+                    topSection.style.color = textColor;
+                }
+
+                // 更新搜索框样式
+                const searchInput = document.querySelector('.search-input');
+                if (searchInput) {
+                    searchInput.style.color = textColor;
+                }
+            }
+
+            // 更新时间
+            function updateTime() {
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                timeElement.textContent = `${hours}:${minutes}`;
+            }
+
+            // 初始化主题颜色
+            updateThemeColor();
+
+            // 初始化 Swiper
+            function initSwiper() {
+                if (swiper) {
+                    swiper.destroy();
+                }
+                swiper = new Swiper(".swiper-container", {
+                    slidesPerView: 'auto',
+                    spaceBetween: 16,
+                    centeredSlides: true,
+                    loop: true,
+                    autoplay: {
+                        delay: 3000,
+                        disableOnInteraction: false,
+                    },
+                    pagination: {
+                        el: ".swiper-pagination",
+                        clickable: true,
+                    }
+                });
+            }
+
+            // 初始更新时间并每分钟更新一次
+            updateTime();
+            setInterval(updateTime, 60000);
 
             // 处理图片上传
             imageInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewContent.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-contain rounded-[35px]">`;
-                    };
-                    reader.readAsDataURL(file);
+                const files = e.target.files;
+                if (files && files.length > 0) {
+                    const swiperWrapper = document.querySelector('.swiper-wrapper');
+                    swiperWrapper.innerHTML = ''; // 清空现有内容
+
+                    // 处理每个上传的图片
+                    Array.from(files).forEach((file, index) => {
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                const slide = document.createElement('div');
+                                slide.className = 'swiper-slide';
+                                
+                                const img = new Image();
+                                img.onload = function() {
+                                    // 如果是第一张图片，获取主色并更新主题
+                                    if (index === 0) {
+                                        const canvas = document.createElement('canvas');
+                                        const ctx = canvas.getContext('2d');
+                                        canvas.width = this.width;
+                                        canvas.height = 1;
+                                        ctx.drawImage(this, 0, 0);
+                                        const imageData = ctx.getImageData(0, 0, 1, 1).data;
+                                        const backgroundColor = `#${[...imageData].slice(0,3).map(x => x.toString(16).padStart(2,'0')).join('')}`;
+                                        updateThemeColor(backgroundColor);
+                                    }
+                                    
+                                    img.style.width = '343px';
+                                    img.style.height = '146px';
+                                };
+                                img.src = e.target.result;
+                                
+                                slide.appendChild(img);
+                                swiperWrapper.appendChild(slide);
+
+                                // 重新初始化 Swiper
+                                initSwiper();
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
                 }
             });
 
@@ -149,10 +463,12 @@
             urlInput.addEventListener('change', function(e) {
                 const url = e.target.value.trim();
                 if (url) {
-                    // 这里可以添加 URL 验证
-                    previewContent.innerHTML = `<iframe src="${url}" class="w-full h-full border-0 rounded-[35px]"></iframe>`;
+                    previewContent.innerHTML = `<iframe src="${url}" class="w-full h-full border-0"></iframe>`;
                 }
             });
+
+            // 初始化空的 Swiper
+            initSwiper();
         });
     </script>
 </body>
