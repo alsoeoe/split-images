@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh" class="h-full bg-gray-100">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,7 @@
     <script src="../../lib/browser-image-compression.js"></script>
     <!-- JSZip -->
     <script src="../../lib/jszip.min.js"></script>
+    <link rel="stylesheet" href="style.css">
     <style>
         .drag-over {
             border-color: #4f46e5 !important;
@@ -113,133 +114,131 @@
         }
     </style>
 </head>
-<body class="h-full">
-    <div class="min-h-full">
-        <nav class="border-b border-gray-200 bg-white">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-16 justify-between">
-                    <div class="flex">
-                        <div class="flex shrink-0 items-center">
-                            <a href="../../index.html" class="flex items-center gap-x-2">
-                                <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
-                                </svg>
-                                <span class="text-xl font-bold text-indigo-600">工具箱</span>
-                            </a>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center">
+                <div class="flex items-center gap-x-3">
+                    <a href="../../index.html" class="flex items-center gap-x-3">
+                        <div class="relative">
+                            <svg t="1737523047202" class="h-8 w-8 text-gray-900" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1604" width="200" height="200">
+                                <path d="M0 0h1024v1024H0z" fill="#202425" opacity=".01" p-id="1605"></path>
+                                <path d="M409.6 68.266667a136.533333 136.533333 0 0 0-136.533333 136.533333v34.133333H238.933333a170.666667 170.666667 0 0 0-170.666666 170.666667v375.466667a170.666667 170.666667 0 0 0 170.666666 170.666666h546.133334a170.666667 170.666667 0 0 0 170.666666-170.666666V409.6a170.666667 170.666667 0 0 0-170.666666-170.666667h-34.133334V204.8a136.533333 136.533333 0 0 0-136.533333-136.533333h-204.8z m477.866667 477.866666h-204.8a102.4 102.4 0 0 0-102.4-102.4h-136.533334a102.4 102.4 0 0 0-102.4 102.4H136.533333v-136.533333a102.4 102.4 0 0 1 102.4-102.4h546.133334a102.4 102.4 0 0 1 102.4 102.4v136.533333z m-204.8 68.266667h204.8v170.666667a102.4 102.4 0 0 1-102.4 102.4H238.933333a102.4 102.4 0 0 1-102.4-102.4v-170.666667h204.8a102.4 102.4 0 0 0 102.4 102.4h136.533334a102.4 102.4 0 0 0 102.4-102.4z m-68.266667-34.133333v34.133333a34.133333 34.133333 0 0 1-34.133333 34.133333h-136.533334a34.133333 34.133333 0 0 1-34.133333-34.133333v-68.266667a34.133333 34.133333 0 0 1 34.133333-34.133333h136.533334a34.133333 34.133333 0 0 1 34.133333 34.133333v34.133334z m68.266667-341.333334H341.333333V204.8a68.266667 68.266667 0 0 1 68.266667-68.266667h204.8a68.266667 68.266667 0 0 1 68.266667 68.266667v34.133333z" fill="currentColor" p-id="1606"></path>
+                            </svg>
+                            <div class="absolute inset-0 bg-gray-900/10 blur-xl rounded-full"></div>
                         </div>
-                        <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-                            <span class="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900">图片压缩</span>
+                        <span class="text-xl font-bold text-gray-900">火把工具箱</span>
+                    </a>
+                    <span class="text-gray-300 text-xl">/</span>
+                    <span class="text-xl font-bold text-gray-900">图片压缩</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+            <!-- 控制面板 -->
+            <div class="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
+                <!-- 格式和质量选择 -->
+                <div class="flex items-center justify-between">
+                    <!-- 左侧按钮组 -->
+                    <div class="flex items-center space-x-4">
+                        <div class="format-buttons">
+                            <button class="format-button active" data-format="original">原格式</button>
+                            <button class="format-button" data-format="png">PNG</button>
+                            <button class="format-button" data-format="jpeg">JPEG</button>
+                            <button class="format-button" data-format="webp">WebP</button>
+                        </div>
+                        <div class="format-buttons">
+                            <button class="format-button active" data-quality="0.8">无损</button>
+                            <button class="format-button" data-quality="0.6">最高画质</button>
+                            <button class="format-button" data-quality="0.4">高画质</button>
+                            <button class="format-button" data-quality="0.2">中画质</button>
+                            <button class="format-button" data-quality="0.1">低画质</button>
+                            <button class="format-button" data-quality="0.05">极低画质</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧按钮组 -->
+                    <div class="flex items-center space-x-4">
+                        <button id="compressAllBtn" class="inline-flex items-center justify-center w-10 h-10 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                        <button id="clearListBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            清空列表
+                        </button>
+                        <button id="downloadAllBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            下载全部
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片列表和上传区域的容器 -->
+            <div id="dropZone" class="upload-zone rounded-lg">
+                <!-- 图片列表 -->
+                <div id="imageListContainer" class="hidden">
+                    <div class="overflow-x-auto">
+                        <div class="inline-block min-w-full align-middle">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="relative px-7 sm:w-12 sm:px-6">
+                                            <span class="sr-only">预览</span>
+                                        </th>
+                                        <th scope="col" class="min-w-[12rem] py-3.5 pr-3 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">文件名</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">尺寸</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">原始大小</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">压缩大小</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">压缩率</th>
+                                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-3">
+                                            <span class="sr-only">操作</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="imageListBody" class="divide-y divide-gray-200 bg-white">
+                                    <!-- 图片项会动态添加到这里 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 上传区域 -->
+                <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+                    <div class="text-center">
+                        <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
+                        <div class="text-center">
+                            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+                                <svg class="h-6 w-6 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <div class="mt-4">
+                                <div class="text-sm font-semibold text-gray-900">添加图片</div>
+                                <p class="mt-1 text-sm text-gray-500">拖拽图片到此处，或按 Ctrl+V 粘贴</p>
+                                <button class="mt-4 inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="document.getElementById('fileInput').click()">
+                                    <svg class="-ml-0.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.25 13.25a.75.75 0 001.5 0V4.636l2.955 3.129a.75.75 0 001.09-1.03l-4.25-4.5a.75.75 0 00-1.09 0l-4.25 4.5a.75.75 0 101.09 1.03L9.25 4.636v8.614z" />
+                                        <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+                                    </svg>
+                                    选择图片
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </nav>
-
-        <div class="py-10">
-            <main class="mx-auto max-w-7xl">
-                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-                    <!-- 控制面板 -->
-                    <div class="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
-                        <!-- 格式和质量选择 -->
-                        <div class="flex items-center justify-between">
-                            <!-- 左侧按钮组 -->
-                            <div class="flex items-center space-x-4">
-                                <div class="format-buttons">
-                                    <button class="format-button active" data-format="original">原格式</button>
-                                    <button class="format-button" data-format="png">PNG</button>
-                                    <button class="format-button" data-format="jpeg">JPEG</button>
-                                    <button class="format-button" data-format="webp">WebP</button>
-                                </div>
-                                <div class="format-buttons">
-                                    <button class="format-button active" data-quality="0.8">无损</button>
-                                    <button class="format-button" data-quality="0.6">最高画质</button>
-                                    <button class="format-button" data-quality="0.4">高画质</button>
-                                    <button class="format-button" data-quality="0.2">中画质</button>
-                                    <button class="format-button" data-quality="0.1">低画质</button>
-                                    <button class="format-button" data-quality="0.05">极低画质</button>
-                                </div>
-                            </div>
-                            
-                            <!-- 右侧按钮组 -->
-                            <div class="flex items-center space-x-4">
-                                <button id="compressAllBtn" class="inline-flex items-center justify-center w-10 h-10 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                    </svg>
-                                </button>
-                                <button id="clearListBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    清空列表
-                                </button>
-                                <button id="downloadAllBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                    </svg>
-                                    下载全部
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 图片列表和上传区域的容器 -->
-                    <div id="dropZone" class="upload-zone rounded-lg">
-                        <!-- 图片列表 -->
-                        <div id="imageListContainer" class="hidden">
-                            <div class="overflow-x-auto">
-                                <div class="inline-block min-w-full align-middle">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th scope="col" class="relative px-7 sm:w-12 sm:px-6">
-                                                    <span class="sr-only">预览</span>
-                                                </th>
-                                                <th scope="col" class="min-w-[12rem] py-3.5 pr-3 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">文件名</th>
-                                                <th scope="col" class="px-3 py-3.5 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">尺寸</th>
-                                                <th scope="col" class="px-3 py-3.5 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">原始大小</th>
-                                                <th scope="col" class="px-3 py-3.5 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">压缩大小</th>
-                                                <th scope="col" class="px-3 py-3.5 text-left text-xs uppercase tracking-wider font-semibold text-gray-500">压缩率</th>
-                                                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-3">
-                                                    <span class="sr-only">操作</span>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="imageListBody" class="divide-y divide-gray-200 bg-white">
-                                            <!-- 图片项会动态添加到这里 -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 上传区域 -->
-                        <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
-                            <div class="text-center">
-                                <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
-                                <div class="text-center">
-                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
-                                        <svg class="h-6 w-6 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                                        </svg>
-                                    </div>
-                                    <div class="mt-4">
-                                        <div class="text-sm font-semibold text-gray-900">添加图片</div>
-                                        <p class="mt-1 text-sm text-gray-500">拖拽图片到此处，或按 Ctrl+V 粘贴</p>
-                                        <button class="mt-4 inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="document.getElementById('fileInput').click()">
-                                            <svg class="-ml-0.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M9.25 13.25a.75.75 0 001.5 0V4.636l2.955 3.129a.75.75 0 001.09-1.03l-4.25-4.5a.75.75 0 00-1.09 0l-4.25 4.5a.75.75 0 101.09 1.03L9.25 4.636v8.614z" />
-                                                <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
-                                            </svg>
-                                            选择图片
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
         </div>
     </div>
 
