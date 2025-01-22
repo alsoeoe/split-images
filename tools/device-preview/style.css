@@ -1,0 +1,219 @@
+        :root {
+            --main-color: #4338CA;
+            --bg-color: #f7f8fa;
+            --text-color: #ffffff;
+        }
+
+        /* 添加颜色过渡效果 */
+        .top-section, .status-bar, .search-input, .tag, .battery-icon, .battery-level {
+            transition: all 0.3s ease;
+        }
+
+        .top-section {
+            color: var(--text-color);
+        }
+
+        /* 隐藏滚动条但保持可滚动 */
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;     /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;             /* Chrome, Safari and Opera */
+        }
+
+        /* 设备屏幕 */
+        .device-screen {
+            border-radius: 34px;  /* 设置圆角稍微小于外壳的圆角 */
+            overflow: hidden;
+        }
+
+        /* 预览内容 */
+        .preview-content {
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 顶部区域（包含状态栏、搜索、标签） */
+        .top-section {
+            background-color: var(--main-color);
+            padding-top: 44px;
+            
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 状态栏样式 */
+        .status-bar {
+            height: 44px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background-color: var(--main-color);
+        }
+
+        /* 搜索栏 */
+        .search-bar {
+            height: 48px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+            height: 32px;
+        }
+
+        .search-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            height: 32px;
+            width: 100%;
+            padding: 0 16px 0 40px;
+            outline: none;
+            font-size: 13px;
+            color: inherit;
+        }
+
+        .search-input::placeholder {
+            color: inherit;
+            opacity: 0.6;
+        }
+
+        .punch-button {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* 标签栏 */
+        .tags-bar {
+            height: 40px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        .tags-list {
+            display: flex;
+            gap: 16px;
+            white-space: nowrap;
+            height: 24px;
+            align-items: center;
+        }
+
+        .tag {
+            height: 24px;
+            display: flex;
+            align-items: center;
+            line-height: 24px;
+        }
+
+        .tag.active {
+            font-size: 18px;
+        }
+
+        .tag:not(.active) {
+            font-size: 16px;
+            opacity: 0.6;
+        }
+
+        /* 轮播区域 */
+        .swiper-section {
+            background: linear-gradient(180deg, var(--main-color) 0%, var(--bg-color) 100%);
+            padding: 16px 0 20px;
+            
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background-color: var(--bg-color);
+            min-height: 400px;
+            flex: 1;
+        }
+
+        /* Swiper 样式 */
+        .swiper {
+            width: 375px;
+            height: 146px;
+        }
+
+        .swiper-slide {
+            width: 343px !important;
+            height: 146px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 分页器样式 */
+        .swiper-pagination {
+            bottom: 8px !important;
+        }
+
+        .swiper-pagination-bullet {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.6);
+            opacity: 1;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: #fff;
+        }
+
+        /* 渐变背景 */
+        .gradient-bg {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 100px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 预览模式按钮样式 */
+        .preview-mode-btn {
+            transition: all 0.2s;
+        }
+
+        .preview-mode-btn.active {
+            background-color: rgb(238 242 255);
+            color: rgb(79 70 229);
+        }
+
+        .preview-mode-btn:not(.active):hover {
+            background-color: rgb(249 250 251);
+        }
+
+        /* 设备预览区域 */
+        #previewContent {
+            width: 375px;
+            height: 812px;
+            background: #f7f8fa;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 2px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 44px;
+        }
