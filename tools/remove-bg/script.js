@@ -6,7 +6,9 @@ class RemoveBgTool {
             'UeGL6e1PgnG5HjaBd4zsCyvQ',
             'cr2bvYT674rdtHd6zazs64CW',
             'tvJURXvQD31ozMz1UWoiCjCv',
-            '27865ZdbAFbPpoMuor6kxwMy'
+            '27865ZdbAFbPpoMuor6kxwMy',
+            'HJDZMSwexN6iQJy4Uw7pAnwH',
+            '1ArJ5xby2JBnb5nTWnHV1Z8M'
         ]; // 默认 API Keys
         this.currentKeyIndex = 0;
         this.queue = [];
